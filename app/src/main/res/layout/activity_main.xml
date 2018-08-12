@@ -11,8 +11,8 @@
         android:id="@+id/cadastrarBT"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="17dp"
-        android:layout_marginEnd="26dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="68dp"
         android:text="Cadastre-se"
         app:layout_constraintBottom_toTopOf="@+id/statusTV"
         app:layout_constraintEnd_toEndOf="@+id/statusTV" />
@@ -25,6 +25,16 @@
         android:layout_marginStart="72dp"
         android:text="Login"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/logoutBT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="9dp"
+        android:text="Logout"
+        app:layout_constraintBottom_toTopOf="@+id/cadastrarBT"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
@@ -52,12 +62,8 @@
 
     <TextView
         android:id="@+id/statusTV"
-        android:layout_width="0dp"
-        android:layout_height="52dp"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="50dp"
-        android:layout_marginStart="35dp"
-        android:layout_marginTop="17dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="TextView"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         app:layout_constraintBottom_toBottomOf="parent"
