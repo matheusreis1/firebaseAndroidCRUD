@@ -11,8 +11,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthEmailException;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 
 public class CadastroActivity extends AppCompatActivity {
@@ -47,9 +52,20 @@ public class CadastroActivity extends AppCompatActivity {
         cadastrarBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                signUp();
+                if ( verifyFields(emailTF.getText().toString(), senhaTF.getText().toString()) ) {
+                    signUp();
+                } else {
+                    Toast.makeText(CadastroActivity.this, "Erro: Os campos de email e senha são obrigatórios", Toast.LENGTH_LONG).show();
+                }
             }
         });
+    }
+
+    private boolean verifyFields(String email, String senha) {
+        if ( ( email.equals("") ) || ( senha.equals("") ) ) {
+            return false;
+        }
+        return true;
     }
 
     private void signUp() {
@@ -60,14 +76,39 @@ public class CadastroActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         FirebaseUser user = firebaseAuth.getCurrentUser();
-                        mainActivity.updateUI(user);
+                        mainLogged(user);
                     } else {
-                        // If sign in fails, display a message to the user.
-                        Toast.makeText(CadastroActivity.this, "Erro ao autenticar usuário.", Toast.LENGTH_SHORT).show();
-                        mainActivity.updateUI(null);
+                        String error;
+
+                        try{
+                            throw task.getException();
+                        } catch (FirebaseAuthWeakPasswordException e) {
+                            error = "Digite uma senha mais forte, com no mínimo 8 caracteres, entre letras e números!";
+                        } catch (FirebaseAuthInvalidCredentialsException e) {
+                            error = "O email digitado é inválido, digite um email válido!";
+                        } catch (FirebaseAuthUserCollisionException e) {
+                            error = "Esse email já está cadastrado!";
+                        } catch (FirebaseNetworkException e) {
+                            error = "Sem acesso a internet";
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            error = "Erro ao efetuar cadastro";
+                            e.printStackTrace();
+                        }
+
+                        Toast.makeText(CadastroActivity.this, "Erro: "+error, Toast.LENGTH_LONG).show();
                     }
                 }
             });
+    }
+
+    private void mainLogged(FirebaseUser currentUser) {
+        if ( currentUser != null) {
+            Intent home = new Intent(CadastroActivity.this, MainActivity.class);
+            home.putExtra("user", currentUser);
+            startActivity(home);
+            finish();
+        }
     }
 
 }

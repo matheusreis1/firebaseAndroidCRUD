@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -36,6 +37,14 @@ public class MainActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+        Intent cadastro = getIntent();
+
+        FirebaseUser user = (FirebaseUser) cadastro.getSerializableExtra("user");
+
+        if ( user != null ) {
+            updateUI(user);
+        }
+
         cadastrarBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -46,7 +55,11 @@ public class MainActivity extends AppCompatActivity {
         loginBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                signIn();
+                if ( verifyFields(emailTF.getText().toString(), senhaTF.getText().toString()) ) {
+                    signIn();
+                } else {
+                    Toast.makeText(MainActivity.this, "Erro: Os campos de email e senha são obrigatórios", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -66,6 +79,13 @@ public class MainActivity extends AppCompatActivity {
         updateUI(currentUser);
     }
 
+    private boolean verifyFields(String email, String senha) {
+        if ( ( email.equals("") ) || ( senha.equals("") ) ) {
+            return false;
+        }
+        return true;
+    }
+
     public void updateUI(FirebaseUser currentUser) {
         if ( currentUser != null ) {
             statusUser.setText(currentUser.getEmail());
@@ -82,16 +102,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void signIn() {
         firebaseAuth.signInWithEmailAndPassword(emailTF.getText().toString(), senhaTF.getText().toString())
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if ( task.isSuccessful() ) {
-                            FirebaseUser user = firebaseAuth.getCurrentUser();
-                            updateUI(user);
-                        } else {
-                            updateUI(null);
-                        }
+            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if ( task.isSuccessful() ) {
+                        FirebaseUser user = firebaseAuth.getCurrentUser();
+                        updateUI(user);
+                    } else {
+                        updateUI(null);
                     }
-                });
+                }
+            });
     }
 }
